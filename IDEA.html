@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f7fb">
+  <title>Idea — Student Project Portal</title>
+  <style>
+    :root {
+      --ink: #1d2340;
+      --muted: #626a80;
+      --line: #eceef4;
+      --paper: #fff;
+      --canvas: #f7f8fc;
+      --purple: #6d63e8;
+      --purple-dark: #554bd0;
+      --purple-soft: #f0efff;
+      --green: #28a879;
+      --green-soft: #e8f7f1;
+      --orange: #e59b42;
+      --orange-soft: #fff4e5;
+      --red: #df696c;
+      --shadow: 0 12px 35px rgba(37, 45, 80, .055);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--canvas);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--canvas); }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 250px;
+      flex: 0 0 250px;
+      min-height: 100vh;
+      padding: 27px 17px 20px;
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 31px; }
+    .brand-mark {
+      width: 35px;
+      height: 35px;
+      border-radius: 12px;
+      background: var(--purple);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(109, 99, 232, .25);
+    }
+    .brand-mark svg { width: 21px; height: 21px; }
+    .brand-name { font-size: 19px; font-weight: 750; letter-spacing: -.7px; }
+    .brand-name span { color: var(--purple); }
+    .workspace-label { padding: 0 11px; margin: 0 0 11px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.15px; font-weight: 750; color: #70768b; }
+    .nav-list { display: grid; gap: 5px; }
+    .nav-item {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #626a80;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 580;
+      transition: background .18s ease, color .18s ease;
+    }
+    .nav-item:hover { background: #f7f7fc; color: var(--ink); }
+    .nav-item.active { background: var(--purple-soft); color: var(--purple-dark); font-weight: 700; }
+    .nav-item svg { width: 18px; height: 18px; flex: 0 0 18px; stroke-width: 1.8; }
+    .nav-count { margin-left: auto; min-width: 20px; padding: 2px 6px; border-radius: 8px; text-align: center; background: #fff; font-size: 10px; color: var(--purple); }
+    .sidebar-bottom { margin-top: auto; }
+    .help-card {
+      margin: 0 3px 17px;
+      padding: 15px 14px;
+      border-radius: 13px;
+      background: #f8f7ff;
+      border: 1px solid #eeedff;
+    }
+    .help-title { font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+    .help-copy { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 11px; }
+    .help-link { padding: 0; border: 0; color: var(--purple); background: transparent; font-size: 11px; font-weight: 700; }
+    .profile {
+      border-top: 1px solid var(--line);
+      padding: 17px 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 35px; height: 35px; border-radius: 50%; display: grid; place-items: center;
+      color: #5a519d; background: #eae8ff; font-weight: 750; font-size: 11px; flex: 0 0 auto;
+    }
+    .avatar.blue { color: #397c91; background: #e5f4f7; }
+    .avatar.orange { color: #a06e35; background: #fff0dc; }
+    .avatar.green { color: #328165; background: #e5f5ee; }
+    .avatar.rose { color: #a35b73; background: #ffedf2; }
+    .profile-info { min-width: 0; flex: 1; }
+    .profile-name { font-size: 12px; font-weight: 700; }
+    .profile-role { color: var(--muted); font-size: 10px; margin-top: 2px; }
+    .profile-role span { display: block; }
+    .profile-menu { border: 0; background: transparent; color: #969bad; font-size: 20px; padding: 2px 6px; }
+    .logout-link { border: 1px solid var(--line); background: var(--purple-soft); color: var(--purple-dark); font-size: 10px; font-weight: 700; padding: 7px 9px; border-radius: 8px; white-space: nowrap; }
+    .logout-link:hover { border-color: var(--purple); background: var(--paper); }
+    .main-area { min-width: 0; flex: 1; }
+    .topbar {
+      height: 72px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.82);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 39px;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      backdrop-filter: blur(14px);
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; color: #687086; font-size: 12px; }
+    .breadcrumb strong { color: var(--ink); font-size: 12px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .term-pill { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid var(--line); background: white; border-radius: 8px; color: #777e96; font-size: 10px; }
+    .term-pill span { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .icon-button { width: 35px; height: 35px; border: 1px solid var(--line); background: #fff; border-radius: 10px; display: grid; place-items: center; color: #797f96; position: relative; }
+    .icon-button svg { width: 17px; height: 17px; }
+    .icon-button #themeIcon { font-size: 17px; line-height: 1; }
+    .notification-dot { width: 7px; height: 7px; border-radius: 50%; background: #ee7e7e; position: absolute; right: 7px; top: 6px; border: 1px solid #fff; }
+    .role-switch { border: 1px solid #e8e7f8; background: #f6f5ff; padding: 4px; display: flex; gap: 3px; border-radius: 10px; }
+    .role-option { border: 0; background: transparent; color: #898da1; padding: 6px 10px; font-size: 10px; font-weight: 700; border-radius: 7px; }
+    .role-option.active { background: #fff; color: var(--purple-dark); box-shadow: 0 2px 7px rgba(44, 44, 88, .08); }
+    .theme-select { min-height: 34px; max-width: 118px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-size: 10px; }
+    .content { width: min(1190px, 100%); margin: 0 auto; padding: 32px 39px 48px; }
+    .page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 26px; }
+    .eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.3px; color: var(--purple); font-weight: 800; margin: 0 0 7px; }
+    h1 { margin: 0; font-size: clamp(24px, 2.4vw, 29px); line-height: 1.18; letter-spacing: -1px; font-weight: 750; }
+    .page-subtitle { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+    .button-primary, .button-secondary {
+      border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 37px; border-radius: 9px; padding: 0 13px; font-size: 11px; font-weight: 700;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+    .button-primary { background: var(--purple); color: #fff; box-shadow: 0 5px 12px rgba(109,99,232,.16); }
+    .button-primary:hover { background: var(--purple-dark); box-shadow: 0 7px 15px rgba(109,99,232,.24); transform: translateY(-1px); }
+    .button-secondary { color: #626985; background: #fff; border: 1px solid var(--line); }
+    .button-secondary:hover { background: #fafaff; border-color: #d8d6f7; }
+    .button-primary svg, .button-secondary svg { width: 15px; height: 15px; }
+    .welcome-banner {
+      min-height: 152px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 25px 29px; border-radius: 16px;
+      background: linear-gradient(107deg, #655de0 0%, #766be9 56%, #9387f0 100%);
+      color: #fff; box-shadow: 0 12px 25px rgba(101,93,224,.15);
+    }
+    .welcome-banner:before, .welcome-banner:after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; pointer-events: none; }
+    .welcome-banner:before { width: 255px; height: 255px; right: 108px; top: -146px; }
+    .welcome-banner:after { width: 315px; height: 315px; right: -25px; bottom: -243px; }
+    .welcome-copy { position: relative; z-index: 1; }
+    .welcome-kicker { font-size: 10px; letter-spacing: .5px; color: rgba(255,255,255,.75); margin-bottom: 8px; }
+    .welcome-title { margin: 0 0 7px; font-weight: 720; font-size: 21px; letter-spacing: -.5px; }
+    .welcome-subtitle { color: rgba(255,255,255,.81); margin: 0; font-size: 11px; }
+    .welcome-banner .button-primary { background: #fff; color: var(--purple-dark); box-shadow: 0 5px 14px rgba(33,28,104,.14); position: relative; z-index: 1; }
+    .welcome-banner .button-primary:hover { background: #f6f5ff; }
+    .banner-art { position: absolute; right: 100px; top: 50%; transform: translateY(-50%) rotate(-7deg); width: 110px; height: 90px; opacity: .84; }
+    .paper-art { position: absolute; width: 55px; height: 69px; background: rgba(255,255,255,.94); border-radius: 7px; box-shadow: 0 8px 18px rgba(35,30,116,.15); }
+    .paper-art:before { content: ""; position: absolute; width: 25px; height: 4px; border-radius: 4px; background: #dbd8ff; left: 10px; top: 17px; box-shadow: 0 10px #e9e7ff, 0 20px #e9e7ff, 14px 20px #e9e7ff; }
+    .paper-art.one { left: 13px; top: 15px; transform: rotate(-13deg); }
+    .paper-art.two { left: 45px; top: 7px; transform: rotate(12deg); background: #fff; }
+    .banner-spark { position: absolute; right: 4px; top: 12px; color: #ffdf9a; font-size: 19px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin: 19px 0 22px; }
+    .stat-card { min-height: 100px; background: #fff; border: 1px solid var(--line); box-shadow: 0 3px 12px rgba(33,42,76,.025); border-radius: 12px; padding: 15px 16px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: #626a80; font-size: 10px; }
+    .stat-icon { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 9px; background: var(--purple-soft); color: var(--purple); }
+    .stat-icon svg { width: 15px; height: 15px; }
+    .stat-icon.green { color: var(--green); background: var(--green-soft); }
+    .stat-icon.orange { color: var(--orange); background: var(--orange-soft); }
+    .stat-icon.blue { color: #5e92cf; background: #edf5ff; }
+    .stat-value { font-size: 23px; font-weight: 750; letter-spacing: -.7px; margin-top: 8px; line-height: 1; }
+    .stat-note { font-size: 9px; color: #687086; margin-top: 6px; }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(250px, .9fr); gap: 17px; align-items: start; }
+    .panel { background: #fff; border: 1px solid var(--line); border-radius: 13px; box-shadow: 0 3px 12px rgba(33,42,76,.025); }
+    .panel-header { padding: 17px 18px 13px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .panel-title { font-size: 13px; font-weight: 750; margin: 0; letter-spacing: -.1px; }
+    .panel-description { font-size: 10px; color: var(--muted); margin: 5px 0 0; }
+    .text-button { color: var(--purple); padding: 2px 0; border: 0; background: transparent; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .projects-list { padding: 0 18px 5px; }
+    .project-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #f1f2f6; }
+    .project-icon { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; color: var(--purple); background: #f2f1ff; }
+    .project-icon.green { background: #eaf8f1; color: #32a376; }
+    .project-icon.orange { background: #fff4e7; color: #d69441; }
+    .project-icon svg { width: 19px; height: 19px; }
+    .project-info { flex: 1; min-width: 0; }
+    .project-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .project-meta { color: var(--muted); font-size: 9px; }
+    .teacher-remark { margin-top: 12px; padding: 13px 15px; border: 1px solid var(--line); border-left: 4px solid var(--purple); border-radius: 9px; background: var(--purple-soft); color: var(--ink); font-size: 13px; font-weight: 550; line-height: 1.55; }
+    .teacher-remark strong { display: block; margin-bottom: 5px; color: var(--purple-dark); font-size: 12px; font-weight: 800; }
+    .status { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; padding: 5px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; }
+    .status:before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.review { background: var(--orange-soft); color: #c7822d; }
+    .status.approved { background: var(--green-soft); color: #258c68; }
+    .status.draft { background: #f1f2f6; color: #82889a; }
+    .team-panel { margin-bottom: 16px; }
+    .team-members { padding: 0 17px 15px; }
+    .member-row { display: flex; align-items: center; gap: 9px; padding: 8px 0; }
+    .member-row .avatar { width: 30px; height: 30px; font-size: 9px; }
+    .member-details { flex: 1; min-width: 0; }
+    .member-name { font-size: 10px; font-weight: 700; }
+    .member-role { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .leader-tag { font-size: 8px; padding: 3px 6px; border-radius: 5px; color: var(--purple); background: var(--purple-soft); font-weight: 700; }
+    .add-member { margin-top: 7px; width: 100%; padding: 8px; border: 1px dashed #deddf5; color: var(--purple); border-radius: 8px; background: #fbfaff; font-size: 10px; font-weight: 700; }
+    .query-list { padding: 0 17px 12px; }
+    .query-item { display: flex; gap: 9px; border-top: 1px solid #f1f2f6; padding: 10px 0; }
+    .query-bullet { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; margin-top: 4px; background: var(--orange); }
+    .query-bullet.answered { background: var(--green); }
+    .query-copy { min-width: 0; flex: 1; }
+    .query-title { font-size: 10px; font-weight: 650; line-height: 1.4; }
+    .query-meta { margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .empty-state { padding: 25px 12px; text-align: center; color: var(--muted); font-size: 11px; }
+    .chat-layout { display: grid; grid-template-columns: 220px minmax(0,1fr); min-height: 470px; overflow: hidden; }
+    .chat-threads { border-right: 1px solid var(--line); padding: 15px 10px; }
+    .thread-label { padding: 0 9px; margin: 2px 0 9px; color: #687086; font-size: 9px; font-weight: 750; letter-spacing: .8px; text-transform: uppercase; }
+    .thread-button { width: 100%; display: flex; gap: 9px; align-items: center; padding: 9px; text-align: left; border: 0; background: transparent; border-radius: 9px; color: var(--ink); }
+    .thread-button.active { background: var(--purple-soft); }
+    .thread-button .avatar { width: 31px; height: 31px; font-size: 9px; }
+    .thread-name { font-size: 10px; font-weight: 700; }
+    .thread-preview { font-size: 9px; color: var(--muted); margin-top: 3px; }
+    .chat-room { min-width: 0; display: flex; flex-direction: column; }
+    .chat-room-head { display: flex; align-items: center; gap: 9px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .chat-room-head .avatar { width: 32px; height: 32px; font-size: 9px; }
+    .chat-room-title { font-size: 11px; font-weight: 750; }
+    .chat-room-subtitle { color: var(--muted); font-size: 9px; margin-top: 3px; }
+    .chat-messages { display: flex; flex-direction: column; gap: 13px; flex: 1; padding: 17px; overflow-y: auto; max-height: 340px; }
+    .chat-date { text-align: center; font-size: 9px; color: #687086; }
+    .message { display: flex; align-items: flex-end; gap: 7px; max-width: 84%; }
+    .message.mine { margin-left: auto; flex-direction: row-reverse; }
+    .message .avatar { width: 24px; height: 24px; font-size: 8px; }
+    .message-bubble { background: #f3f4f8; color: #555d73; border-radius: 11px 11px 11px 3px; padding: 8px 10px; font-size: 10px; line-height: 1.5; }
+    .message.mine .message-bubble { background: var(--purple); color: #fff; border-radius: 11px 11px 3px 11px; }
+    .message-time { font-size: 8px; color: #687086; padding: 0 4px 2px; white-space: nowrap; }
+    .chat-form { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-top: 1px solid var(--line); }
+    .chat-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 9px; outline: 0; padding: 9px 11px; font-size: 10px; color: var(--ink); }
+    .chat-input:focus, .field:focus, .textarea:focus { border-color: #b6b1f5; box-shadow: 0 0 0 3px rgba(109,99,232,.09); }
+    .chat-send { height: 34px; width: 36px; border: 0; border-radius: 9px; display: grid; place-items: center; background: var(--purple); color: #fff; }
+    .chat-send svg { width: 15px; height: 15px; }
+    .toolbar { display: flex; align-items: center; gap: 9px; }
+    .select-filter { min-height: 35px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: #747b91; font-size: 10px; }
+    .teacher-project { min-height: 88px; margin: 10px 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); box-shadow: 0 4px 14px rgba(37,45,80,.035); cursor: pointer; transition: border-color .15s ease, background .15s ease, box-shadow .15s ease; }
+    .teacher-project:hover { border-color: var(--purple); background: var(--paper); box-shadow: 0 7px 20px rgba(37,45,80,.075); }
+    .teacher-project-summary { display: flex; align-items: center; gap: 12px; }
+    .teacher-project-summary .project-icon { width: 46px; height: 46px; border-radius: 12px; }
+    .teacher-project-info { flex: 1; min-width: 0; }
+    .teacher-project .button-secondary { margin-left: 0; min-height: 33px; font-size: 10px; }
+    .project-detail-actions .status { margin-right: auto; }
+    .project-title-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 0; background: transparent; padding: 0; color: var(--ink); font-size: 14px; font-weight: 750; text-align: left; cursor: pointer; }
+    .project-title-toggle:hover { color: var(--purple-dark); }
+    .project-title-toggle:after { content: "⌄"; flex: 0 0 26px; width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; color: var(--purple-dark); font-size: 15px; transition: transform .15s ease; }
+    .project-title-toggle[aria-expanded="true"]:after { transform: rotate(180deg); }
+    .project-title-toggle:focus-visible { outline: 2px solid var(--purple); outline-offset: 4px; border-radius: 3px; }
+    .project-open-file { margin-top: 8px; min-height: 32px; font-size: 10px; }
+    .teacher-project .project-meta { margin-top: 6px; font-size: 12px; }
+    .project-attach-action { padding: 0 0 10px 51px; }
+    .project-details { margin: 16px 0 0 54px; padding: 18px; border: 1px solid var(--line); border-left: 4px solid var(--purple); border-radius: 12px; background: var(--paper); box-shadow: 0 5px 18px rgba(37,45,80,.045); }
+    .project-detail-section { padding: 15px; border: 1px solid var(--line); border-radius: 10px; background: var(--canvas); }
+    .project-detail-section + .project-detail-section { margin-top: 12px; }
+    .project-detail-heading { margin: 0 0 14px; color: var(--purple-dark); font-size: 12px; font-weight: 800; letter-spacing: .65px; text-transform: uppercase; }
+    .project-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
+    .project-detail-item { min-width: 0; }
+    .project-detail-label { display: block; color: var(--muted); font-size: 10px; font-weight: 600; margin-bottom: 5px; }
+    .project-detail-value { color: var(--ink); font-size: 12px; font-weight: 550; line-height: 1.45; overflow-wrap: anywhere; }
+    .project-detail-actions { display: flex; align-items: center; gap: 10px; padding-top: 14px; margin-top: 15px; border-top: 1px solid var(--line); }
+    .project-detail-actions .button-secondary { min-height: 36px; padding: 0 12px; font-size: 11px; }
+    @media (max-width: 520px) { .teacher-project { margin: 9px 8px; padding: 16px 13px; } .project-details { margin-left: 0; padding: 12px; } .project-detail-section { padding: 12px; } .project-detail-grid { grid-template-columns: 1fr; } }
+    .progress-track { height: 5px; border-radius: 5px; background: #eeeef6; margin-top: 12px; overflow: hidden; }
+    .progress-fill { width: 72%; height: 100%; background: var(--purple); border-radius: inherit; }
+    .toast { position: fixed; right: 23px; bottom: 23px; z-index: 20; padding: 11px 15px; color: #fff; background: #282d49; border-radius: 10px; box-shadow: 0 8px 26px rgba(20,25,48,.2); font-size: 11px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(24,28,50,.38); display: grid; place-items: center; z-index: 10; padding: 18px; }
+    .modal { width: min(440px, 100%); background: #fff; border-radius: 15px; padding: 22px; box-shadow: 0 20px 70px rgba(21,24,49,.24); animation: appear .16s ease-out; }
+    @keyframes appear { from { opacity: 0; transform: translateY(6px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 17px; }
+    .modal-title { font-size: 16px; font-weight: 750; margin: 0; }
+    .modal-subtitle { color: var(--muted); font-size: 10px; margin: 5px 0 0; }
+    .modal-close { border: 0; background: transparent; color: #9298a9; font-size: 20px; padding: 0 3px; line-height: 1; }
+    .field-label { display: block; color: #5f6680; font-size: 10px; font-weight: 700; margin: 12px 0 6px; }
+    .field, .textarea { display: block; width: 100%; border: 1px solid #e8eaf1; border-radius: 8px; outline: 0; padding: 10px 11px; color: var(--ink); background: #fff; font-size: 11px; }
+    .textarea { resize: vertical; min-height: 89px; line-height: 1.5; }
+    .drop-zone { border: 1px dashed #d7d4f5; background: #faf9ff; border-radius: 10px; text-align: center; padding: 18px 12px; margin-top: 13px; color: #777e96; font-size: 10px; cursor: pointer; }
+    .drop-zone svg { width: 21px; height: 21px; color: var(--purple); display: block; margin: 0 auto 7px; }
+    .drop-zone strong { display: block; color: var(--ink); font-size: 10px; margin-bottom: 4px; }
+    .file-input { display: none; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }
+    .modal-actions .button-primary, .modal-actions .button-secondary { min-height: 35px; }
+    .hidden { display: none !important; }
+    .auth-screen { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 22px; background: radial-gradient(circle at 85% 15%, #e7e4ff 0, transparent 32%), var(--canvas); }
+    .auth-card { width: min(430px, 100%); margin: auto 0; flex: 0 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 30px; box-shadow: 0 24px 70px rgba(37,45,80,.12); }
+    .auth-card .brand { padding: 0 0 24px; }
+    .auth-card h1 { font-size: 23px; }
+    .auth-copy { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0 18px; }
+    .auth-tabs { display: flex; padding: 4px; border-radius: 9px; background: #f5f5fa; margin-bottom: 17px; }
+    .auth-tabs button { flex: 1; border: 0; border-radius: 7px; background: transparent; color: var(--muted); padding: 8px; font-size: 11px; font-weight: 700; }
+    .auth-tabs button.active { background: white; color: var(--purple-dark); box-shadow: 0 2px 7px #282c490d; }
+    .auth-error { min-height: 16px; color: var(--red); font-size: 10px; margin-top: 8px; }
+    .auth-card .button-primary { width: 100%; margin-top: 10px; }
+    .password-field { position: relative; }
+    .password-field .field { padding-right: 44px; }
+    .password-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); }
+    .password-toggle:hover { color: var(--purple-dark); background: var(--purple-soft); }
+    .password-toggle svg { width: 17px; height: 17px; }
+    html[data-theme="ambient"] { color-scheme: light; --ink:#453f36; --muted:#6f6559; --line:#e3d8c9; --paper:#fffaf2; --canvas:#f4ecdf; --purple:#6f6038; --purple-dark:#594a28; --purple-soft:#f1ead9; --green:#356c55; --green-soft:#e4f0e6; --orange:#8a591e; --orange-soft:#f8ead8; }
+    html[data-theme="night"] { color-scheme: dark; --ink:#e8eaf0; --muted:#a2a9b7; --line:#343c49; --paper:#1d2430; --canvas:#141a23; --purple:#a99cff; --purple-dark:#c1b8ff; --purple-soft:#302b47; --green:#6fc5a0; --green-soft:#20392f; --orange:#e0aa62; --orange-soft:#3a3022; --red:#e88989; }
+    html[data-theme="night"] body, html[data-theme="ambient"] body { background: var(--canvas); color: var(--ink); }
+    html[data-theme="night"] .sidebar, html[data-theme="ambient"] .sidebar { background: var(--paper); border-color: var(--line); }
+    html[data-theme="night"] .topbar, html[data-theme="night"] .panel, html[data-theme="night"] .stat-card, html[data-theme="night"] .auth-card, html[data-theme="night"] .modal, html[data-theme="night"] .icon-button, html[data-theme="night"] .term-pill, html[data-theme="night"] .select-filter, html[data-theme="night"] .field, html[data-theme="night"] .chat-input, html[data-theme="night"] .role-switch, html[data-theme="night"] .theme-select,
+    html[data-theme="ambient"] .topbar, html[data-theme="ambient"] .panel, html[data-theme="ambient"] .stat-card, html[data-theme="ambient"] .auth-card, html[data-theme="ambient"] .modal, html[data-theme="ambient"] .icon-button, html[data-theme="ambient"] .term-pill, html[data-theme="ambient"] .select-filter, html[data-theme="ambient"] .field, html[data-theme="ambient"] .chat-input, html[data-theme="ambient"] .role-switch, html[data-theme="ambient"] .theme-select { background-color: var(--paper); color: var(--ink); border-color: var(--line); }
+    html[data-theme="night"] .project-row, html[data-theme="night"] .teacher-project, html[data-theme="night"] .chat-threads, html[data-theme="night"] .chat-form, html[data-theme="night"] .profile, html[data-theme="ambient"] .project-row, html[data-theme="ambient"] .teacher-project, html[data-theme="ambient"] .chat-threads, html[data-theme="ambient"] .chat-form, html[data-theme="ambient"] .profile { border-color: var(--line); }
+    html[data-theme="night"] .nav-item, html[data-theme="night"] .role-option, html[data-theme="night"] .breadcrumb, html[data-theme="night"] .project-meta, html[data-theme="night"] .panel-description, html[data-theme="night"] .member-role, html[data-theme="night"] .query-meta, html[data-theme="ambient"] .nav-item, html[data-theme="ambient"] .role-option, html[data-theme="ambient"] .breadcrumb, html[data-theme="ambient"] .project-meta, html[data-theme="ambient"] .panel-description, html[data-theme="ambient"] .member-role, html[data-theme="ambient"] .query-meta { color: var(--muted); }
+    html[data-theme="night"] .nav-item.active, html[data-theme="ambient"] .nav-item.active { background: var(--purple-soft); color: var(--purple-dark); }
+    html[data-theme="night"] .button-secondary, html[data-theme="ambient"] .button-secondary { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+    html[data-theme="night"] .project-icon, html[data-theme="night"] .thread-button.active, html[data-theme="ambient"] .project-icon, html[data-theme="ambient"] .thread-button.active { background: var(--purple-soft); color: var(--purple-dark); }
+    html[data-theme="night"] .thread-button, html[data-theme="ambient"] .thread-button { color: var(--ink); }
+    html[data-theme="night"] .message-bubble, html[data-theme="night"] .query-item, html[data-theme="night"] .member-row, html[data-theme="ambient"] .message-bubble, html[data-theme="ambient"] .query-item, html[data-theme="ambient"] .member-row { border-color: var(--line); }
+    html[data-theme="night"] .message-bubble { background: #2b3340; color: var(--ink); }
+    html[data-theme="night"] .nav-count { background: #2b3340; color: var(--purple); }
+    html[data-theme="night"] .role-option.active { background: #2b3340; color: var(--purple-dark); }
+    html[data-theme="night"] .auth-screen { background: radial-gradient(circle at 85% 15%, #29253d 0, transparent 32%), var(--canvas); }
+    html[data-theme="ambient"] .auth-screen { background: radial-gradient(circle at 85% 15%, #eee2c9 0, transparent 32%), var(--canvas); }
+    html[data-theme="night"] .stat-top, html[data-theme="night"] .stat-note, html[data-theme="night"] .thread-label, html[data-theme="night"] .thread-preview, html[data-theme="night"] .chat-date, html[data-theme="night"] .message-time, html[data-theme="night"] .field-label, html[data-theme="night"] .drop-zone, html[data-theme="night"] .auth-tabs button, html[data-theme="night"] .modal-close, html[data-theme="night"] .help-copy, html[data-theme="night"] .workspace-label, html[data-theme="ambient"] .stat-top, html[data-theme="ambient"] .stat-note, html[data-theme="ambient"] .thread-label, html[data-theme="ambient"] .thread-preview, html[data-theme="ambient"] .chat-date, html[data-theme="ambient"] .message-time, html[data-theme="ambient"] .field-label, html[data-theme="ambient"] .drop-zone, html[data-theme="ambient"] .auth-tabs button, html[data-theme="ambient"] .modal-close, html[data-theme="ambient"] .help-copy, html[data-theme="ambient"] .workspace-label { color: var(--muted); }
+    html[data-theme="night"] .auth-tabs, html[data-theme="night"] .drop-zone, html[data-theme="night"] .help-card, html[data-theme="night"] .message-bubble:not(.mine), html[data-theme="ambient"] .auth-tabs, html[data-theme="ambient"] .drop-zone, html[data-theme="ambient"] .help-card, html[data-theme="ambient"] .message-bubble:not(.mine) { background: var(--canvas); border-color: var(--line); }
+    html[data-theme="night"] .textarea, html[data-theme="night"] .auth-tabs button.active, html[data-theme="ambient"] .textarea, html[data-theme="ambient"] .auth-tabs button.active { background: var(--paper); color: var(--ink); border-color: var(--line); }
+    html[data-theme="night"] .status.review { color: #ffd18a; }
+    html[data-theme="night"] .status.approved { color: #8de0ba; }
+    html[data-theme="night"] .status.draft { background: #303744; color: #d0d5df; }
+    html[data-theme="night"] .button-primary, html[data-theme="night"] .chat-send { background: #6253d8; color: #fff; }
+    html[data-theme="night"] .button-primary:hover { background: #7467e6; }
+    html[data-theme="night"] .welcome-banner .button-primary { background: #fff; color: #5146b5; }
+    html[data-theme="ambient"] .status.review { color: #75480f; }
+    html[data-theme="ambient"] .status.approved { color: #235e45; }
+    html[data-theme="ambient"] .status.draft { background: #eee9df; color: #514b42; }
+    html[data-theme="ambient"] .button-primary, html[data-theme="ambient"] .chat-send { background: #5b4b28; color: #fff; }
+    html[data-theme="ambient"] .button-primary:hover { background: #46391d; }
+    html[data-theme="ambient"] .welcome-banner .button-primary { background: #fffaf2; color: #594a28; }
+    :root { --red: #b64045; }
+    html[data-theme="night"] { --red:#ff9b9b; }
+    html[data-theme="ambient"] { --red:#963b40; }
+    .status.review { color: #8b5717; }
+    .status.approved { color: #1c6a4c; }
+    .field-label { color: var(--ink); }
+    .stat-icon.blue { color: #376d9f; }
+    html[data-theme="night"] .message.mine .message-bubble { background:#6253d8; color:#fff; }
+    html[data-theme="night"] .add-member { background:#282f3c; color:#d0c8ff; border-color:#49435f; }
+    html[data-theme="ambient"] .add-member { background:#f0e8d9; color:#594a28; border-color:#d8cbb4; }
+    html[data-theme="night"] .nav-item:hover { background:#272f3c; }
+    html[data-theme="ambient"] .nav-item:hover { background:#f0e8dc; }
+    html[data-theme="night"] .teacher-project:hover { background:#242c38; }
+    html[data-theme="ambient"] .teacher-project:hover { background:#fffaf2; }
+    html[data-theme="night"] .project-details { background:#171d26; border-color:var(--line); border-left-color:var(--purple); }
+    html[data-theme="night"] .project-detail-section { background:#202834; border-color:var(--line); }
+    html[data-theme="ambient"] .project-details { background:#fffaf2; border-color:var(--line); border-left-color:var(--purple); }
+    html[data-theme="ambient"] .project-detail-section { background:#f4ecdf; border-color:var(--line); }
+    .mobile-menu { display: none; }
+    @media (max-width: 1000px) {
+      .sidebar { width: 218px; flex-basis: 218px; }
+      .topbar { padding: 0 25px; }
+      .content { padding: 27px 25px 40px; }
+      .banner-art { right: 67px; }
+    }
+    @media (max-width: 760px) {
+      .sidebar { width: 65px; flex-basis: 65px; padding: 20px 8px; align-items: center; }
+      .brand { padding: 0 0 28px; }
+      .brand-name, .workspace-label, .nav-item span, .nav-count, .sidebar-bottom, .profile-info, .profile-menu { display: none; }
+      .nav-list { width: 100%; }
+      .nav-item { width: 48px; height: 44px; margin: 0 auto; justify-content: center; padding: 0; }
+      .nav-item svg { width: 19px; height: 19px; }
+      .profile { border: 0; padding: 15px 0 0; margin-top: auto; }
+      .profile .avatar { width: 34px; }
+      .topbar { height: 62px; padding: 0 17px; }
+      .breadcrumb { display: none; }
+      .top-actions { width: 100%; justify-content: flex-end; gap: 8px; }
+      .content { padding: 24px 17px 32px; }
+      .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+      .right-column { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+      .team-panel { margin-bottom: 0; }
+    }
+    @media (max-width: 520px) {
+      .content { padding: 20px 13px 28px; }
+      .topbar { padding: 0 12px; }
+      .term-pill { display: none; }
+      .page-heading { margin-bottom: 18px; }
+      .page-heading .button-primary { min-height: 34px; padding: 0 9px; font-size: 10px; }
+      .page-heading .button-primary svg { display: none; }
+      .page-subtitle { font-size: 10px; }
+      .welcome-banner { padding: 21px 17px; min-height: 140px; }
+      .welcome-title { font-size: 17px; max-width: 220px; }
+      .welcome-subtitle { max-width: 230px; line-height: 1.5; }
+      .welcome-banner .button-primary { align-self: flex-end; min-height: 33px; padding: 0 9px; font-size: 9px; }
+      .banner-art { right: -2px; top: 29px; transform: scale(.75) rotate(-7deg); transform-origin: top right; opacity: .36; }
+      .welcome-banner:before { right: -140px; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; margin: 13px 0 15px; }
+      .stat-card { min-height: 91px; padding: 12px; }
+      .stat-value { font-size: 21px; }
+      .right-column { grid-template-columns: minmax(0,1fr); }
+      .chat-layout { grid-template-columns: 1fr; }
+      .chat-threads { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 8px; }
+      .thread-label { display: none; }
+      .thread-button { min-width: 145px; }
+      .chat-messages { min-height: 230px; }
+      .toolbar { width: 100%; }
+      .toolbar .select-filter { flex: 1; }
+      .panel-header:has(.toolbar) { flex-wrap: wrap; }
+      .teacher-project { gap: 8px; padding: 16px 12px; }
+      .teacher-project .button-secondary { padding: 0 8px; }
+    }
+  </style>
+</head>
+<body>
+  <section class="auth-screen" id="authScreen" aria-label="Account access">
+    <form class="auth-card" id="authForm">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">↗</div><div class="brand-name">Idea</div></div>
+      <div class="auth-tabs"><button type="button" id="signupTab" class="active">Create account</button><button type="button" id="loginTab">Log in</button></div>
+      <h1 id="authTitle">Start with a fresh account</h1>
+      <p class="auth-copy" id="authCopy">Enter your own details to set up your student or teacher workspace.</p>
+      <div id="signupFields">
+        <label class="field-label" for="accountName">Full name</label><input class="field" id="accountName" name="name" autocomplete="name" placeholder="Your name" required>
+        <label class="field-label" for="accountRole">Account type</label><select class="field" id="accountRole" name="role"><option value="student">Student</option><option value="teacher">Teacher</option></select>
+        <div id="studentSetupFields">
+          <label class="field-label" for="accountPost">Your post</label><select class="field" id="accountPost" name="post" required></select>
+          <label class="field-label" for="accountDepartment">Department</label><input class="field" id="accountDepartment" name="department" placeholder="Enter your department" required>
+          <label class="field-label" for="teamNameInput">Team name <span style="font-weight:500;color:#a0a5b5">(optional)</span></label><input class="field" id="teamNameInput" name="teamName" placeholder="Add this later if you like">
+        </div>
+      </div>
+      <label class="field-label" for="accountEmail">Email</label><input class="field" id="accountEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label class="field-label" for="accountPassword">Password</label><div class="password-field"><input class="field" id="accountPassword" name="password" type="password" autocomplete="new-password" placeholder="Create a password" required><button class="password-toggle" id="passwordToggle" type="button" aria-label="Show password" aria-pressed="false" title="Show password"><svg id="passwordEye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
+      <div class="auth-error" id="authError" role="alert"></div>
+      <button class="button-primary" id="authSubmit" type="submit">Submit</button>
+    </form>
+  </section>
+  <div class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7.5 12 3l8 4.5-8 4.5L4 7.5Z"/><path d="M4 12l8 4.5 8-4.5M4 16.5l8 4.5 8-4.5"/></svg>
+        </div>
+        <div class="brand-name">Idea</div>
+      </div>
+      <div class="workspace-label">Workspace</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-page="overview" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Overview</span></button>
+        <button class="nav-item" data-page="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h4l2 2h5A2.5 2.5 0 0 1 20 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-10Z"/><path d="M4.5 10h15"/></svg><span>My projects</span><span class="nav-count" data-count="projects">0</span></button>
+        <button class="nav-item" data-page="team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 20v-1.8a3.2 3.2 0 0 0-3.2-3.2H7.2A3.2 3.2 0 0 0 4 18.2V20"/><circle cx="10" cy="7.5" r="3.5"/><path d="M16 4.2a3.5 3.5 0 0 1 0 6.7M20 20v-1.8a3.2 3.2 0 0 0-2.4-3.1"/></svg><span>My team</span></button>
+        <button class="nav-item" data-page="queries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.1A7.5 7.5 0 1 1 20 11.5Z"/><path d="M9.5 9.2a2.5 2.5 0 1 1 4.3 1.8c-1 .9-1.8 1.2-1.8 2.5M12 16.5h.01"/></svg><span>Queries</span><span class="nav-count" data-count="queries">0</span></button>
+        <button class="nav-item" data-page="messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.1A7.5 7.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/></svg><span>Team chat</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card">
+          <div class="help-title">Need a hand?</div>
+          <div class="help-copy">Find tips for submitting your project and working with your team.</div>
+          <button class="help-link" data-action="help">Visit help center &rarr;</button>
+        </div>
+      </div>
+      <div class="profile">
+        <div class="avatar" id="profileAvatar">AK</div>
+        <div class="profile-info"><div class="profile-name" id="profileName"></div><div class="profile-role" id="profileRole"></div></div>
+        <button class="logout-link" data-action="logout" aria-label="Log out">Log out</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><span>/</span><strong id="breadcrumbCurrent">Overview</strong></div>
+        <div class="top-actions">
+          <button class="icon-button" id="themeToggle" type="button" aria-label="Color mode: Light" title="Color mode: Light"><span id="themeIcon" aria-hidden="true">☼</span></button>
+          <button class="icon-button" data-action="notifications" aria-label="Notifications"><span class="notification-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+        </div>
+      </header>
+      <div class="content" id="content"></div>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="modalHost"></div>
+
+  <script>
+    const icons = {
+      folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3.5 7A2.5 2.5 0 0 1 6 4.5h4l2 2h6A2.5 2.5 0 0 1 20.5 9v8A2.5 2.5 0 0 1 18 19.5H6A2.5 2.5 0 0 1 3.5 17V7Z"/><path d="M4 10h16"/></svg>',
+      upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4m0 0L8 8m4-4 4 4"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg>',
+      clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+      people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 20v-1.8a3.2 3.2 0 0 0-3.2-3.2H7.2A3.2 3.2 0 0 0 4 18.2V20"/><circle cx="10" cy="7.5" r="3.5"/><path d="M16 4.2a3.5 3.5 0 0 1 0 6.7M20 20v-1.8a3.2 3.2 0 0 0-2.4-3.1"/></svg>',
+      send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21 3-7.5 18-3.7-7.8L2 9.5 21 3Z"/><path d="M9.8 13.2 15 8"/></svg>',
+      file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10Z"/><path d="M13 3v7h7M8 15h8M8 18h6"/></svg>'
+    };
+
+    const storedAccounts = JSON.parse(localStorage.getItem("ideaAccounts") || "{}");
+    const activeEmail = localStorage.getItem("ideaSession");
+    const savedAccount = activeEmail ? storedAccounts[activeEmail] : null;
+    const savedWorkspace = savedAccount ? JSON.parse(localStorage.getItem(`ideaWorkspace:${savedAccount.email}`) || "null") : null;
+    const state = {
+      role: savedAccount?.role || "student",
+      account: savedAccount ? { name: savedAccount.name, email: savedAccount.email, role: savedAccount.role, post: savedAccount.post || (savedAccount.role === "teacher" ? "Administrator" : "Team leader"), department: savedAccount.department || "" } : null,
+      page: "overview",
+      teamName: savedWorkspace?.teamName || savedAccount?.teamName || "",
+      courseName: "",
+      selectedThread: "team",
+      projects: savedWorkspace?.projects || [],
+      members: savedWorkspace?.members || (savedAccount?.role === "student" ? [{ name: savedAccount.name, initials: savedAccount.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase(), role: savedAccount.post || "Team leader", color: "", leader: savedAccount.post !== "Team member" }] : []),
+      queries: savedWorkspace?.queries || [],
+      messages: savedWorkspace?.messages || { team: [], studio: [], teacher: [] }
+    };
+
+    const pageNames = { overview: "Overview", projects: "My projects", team: "My team", queries: "Queries", messages: "Team chat" };
+    const content = document.getElementById("content");
+
+    function statusClass(status) {
+      if (status === "Approved") return "approved";
+      if (status === "In review") return "review";
+      return "draft";
+    }
+
+    function projectRow(project) {
+      return `<div class="project-row"><div class="project-icon ${project.color}">${icons.file}</div><div class="project-info"><div class="project-name">${escapeHtml(project.name)}</div><div class="project-meta">${escapeHtml(project.type)} · ${escapeHtml(project.date)}</div>${project.remark ? `<div class="teacher-remark"><strong>Teacher remark</strong>${escapeHtml(project.remark)}</div>` : ""}</div><span class="status ${statusClass(project.status)}">${escapeHtml(project.status)}</span></div>`;
+    }
+
+    function membersList() {
+      return state.members.map(member => `<div class="member-row"><div class="avatar ${member.color}">${escapeHtml(member.initials)}</div><div class="member-details"><div class="member-name">${escapeHtml(member.name)}</div><div class="member-role">${escapeHtml(member.role)}</div></div>${member.leader ? '<span class="leader-tag">LEADER</span>' : ""}</div>`).join("");
+    }
+
+    function queriesList() {
+      return state.queries.map(query => `<div class="query-item"><span class="query-bullet ${query.answered ? "answered" : ""}"></span><div class="query-copy"><div class="query-title">${escapeHtml(query.title)}</div><div class="query-meta">${escapeHtml(query.meta)}</div></div></div>`).join("");
+    }
+
+    function studentOverview() {
+      return `<div class="page-heading"><div><p class="eyebrow">STUDENT WORKSPACE</p><h1>Good morning, ${escapeHtml(state.account?.name || "") } <span aria-hidden="true">✦</span></h1><p class="page-subtitle">Your workspace is ready. Add your project details to get started.</p></div><button class="button-primary" data-action="upload">${icons.upload} Upload a project</button></div>
+        <section class="welcome-banner"><div class="welcome-copy"><div class="welcome-kicker">${escapeHtml(state.teamName || "YOUR TEAM")}</div><h2 class="welcome-title">Big ideas start with a great team.</h2><p class="welcome-subtitle">Create your team and invite classmates to work together.</p></div><div class="banner-art" aria-hidden="true"><div class="paper-art one"></div><div class="paper-art two"></div><span class="banner-spark">✦</span></div><button class="button-primary" data-action="team">Set up your team <span aria-hidden="true">→</span></button></section>
+        <section class="stats-grid" aria-label="Project summary">
+          <article class="stat-card"><div class="stat-top"><span>Active projects</span><span class="stat-icon">${icons.folder}</span></div><div class="stat-value" id="projectStat">${state.projects.length.toString().padStart(2, "0")}</div><div class="stat-note">Across this semester</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Approved</span><span class="stat-icon green">${icons.check}</span></div><div class="stat-value">${state.projects.filter(p => p.status === "Approved").length.toString().padStart(2, "0")}</div><div class="stat-note">You’re doing great!</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Awaiting feedback</span><span class="stat-icon orange">${icons.clock}</span></div><div class="stat-value">${state.projects.filter(p => p.status === "In review").length.toString().padStart(2, "0")}</div><div class="stat-note">Your teacher will be in touch</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Team members</span><span class="stat-icon blue">${icons.people}</span></div><div class="stat-value">${state.members.length.toString().padStart(2, "0")}</div><div class="stat-note">Everyone’s on the same page</div></article>
+        </section>
+        <div class="dashboard-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Recent projects</h2><p class="panel-description">Your team's latest submissions and updates</p></div><button class="text-button" data-page="projects">View all &rarr;</button></div><div class="projects-list">${state.projects.slice(0, 3).map(projectRow).join("")}</div></section>
+          <div class="right-column"><section class="panel team-panel"><div class="panel-header"><div><h2 class="panel-title">Your team</h2><p class="panel-description">${escapeHtml(state.teamName || "No team created yet")}</p></div><button class="text-button" data-page="team">Manage</button></div><div class="team-members">${state.members.length ? membersList() : '<div class="empty-state">Your team is empty. Add a teammate when you’re ready.</div>'}<button class="add-member" data-action="add-member">＋ Add a teammate</button></div></section>
+          <section class="panel"><div class="panel-header"><div><h2 class="panel-title">Teacher Q&A</h2><p class="panel-description">Your latest questions</p></div><button class="text-button" data-page="queries">See all</button></div><div class="query-list">${queriesList()}</div></section></div></div>`;
+    }
+
+    function getStudentSubmissions() {
+      const accounts = JSON.parse(localStorage.getItem("ideaAccounts") || "{}");
+      return Object.values(accounts).filter(account => account.role === "student").flatMap(account => {
+        const workspace = JSON.parse(localStorage.getItem(`ideaWorkspace:${account.email}`) || "null");
+        return (workspace?.projects || []).map((project, projectIndex) => ({
+          ...project,
+          studentName: account.name,
+          studentEmail: account.email,
+          department: account.department || "",
+          teamName: workspace.teamName || "Team name not set",
+          teamLeader: (workspace.members || []).find(member => member.leader)?.name || (account.post === "Team leader" ? account.name : "Not set"),
+          teamMembers: (workspace.members || []).filter(member => !member.leader).map(member => member.name).join(", "),
+          ownerEmail: account.email,
+          projectIndex
+        }));
+      });
+    }
+    function formatSubmissionDate(project) {
+      if (project.submittedAt) {
+        const submitted = new Date(project.submittedAt);
+        if (!Number.isNaN(submitted.getTime())) return submitted.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+      }
+      const savedDate = String(project.date || "").replace(/^Submitted\s*/i, "").trim();
+      return /^(today|yesterday|just now)$/i.test(savedDate) || !savedDate ? "Date not recorded" : savedDate;
+    }
+
+    function teacherOverview() {
+      const submissions = getStudentSubmissions();
+      const awaiting = submissions.filter(project => project.status === "In review").length;
+      const teamsCount = new Set(submissions.map(project => project.teamName).filter(name => name !== "Team name not set")).size;
+      return `<div class="page-heading"><div><p class="eyebrow">TEACHER WORKSPACE</p><h1>Good morning, ${escapeHtml(state.account?.name || "")}</h1><p class="page-subtitle">A quick look at your students’ project progress.</p></div><button class="button-secondary" data-action="notifications">View activity</button></div>
+        <section class="welcome-banner"><div class="welcome-copy"><div class="welcome-kicker">YOUR CLASSROOM · DESIGN & TECHNOLOGY</div><h2 class="welcome-title">A little feedback goes a long way.</h2><p class="welcome-subtitle">Review submissions and help every team do their best work.</p></div><div class="banner-art" aria-hidden="true"><div class="paper-art one"></div><div class="paper-art two"></div><span class="banner-spark">✦</span></div><button class="button-primary" data-action="review-all">Review submissions <span aria-hidden="true">→</span></button></section>
+        <section class="stats-grid"><article class="stat-card"><div class="stat-top"><span>Student teams</span><span class="stat-icon">${icons.people}</span></div><div class="stat-value">${teamsCount.toString().padStart(2, "0")}</div><div class="stat-note">Teams with submissions</div></article><article class="stat-card"><div class="stat-top"><span>Submitted projects</span><span class="stat-icon blue">${icons.folder}</span></div><div class="stat-value">${submissions.length.toString().padStart(2, "0")}</div><div class="stat-note">Across student accounts</div></article><article class="stat-card"><div class="stat-top"><span>Awaiting review</span><span class="stat-icon orange">${icons.clock}</span></div><div class="stat-value">${awaiting.toString().padStart(2, "0")}</div><div class="stat-note">Ready for your feedback</div></article><article class="stat-card"><div class="stat-top"><span>Reviewed</span><span class="stat-icon green">${icons.check}</span></div><div class="stat-value">${(submissions.length - awaiting).toString().padStart(2, "0")}</div><div class="stat-note">Projects with a review status</div></article></section>
+        <section class="panel"><div class="panel-header"><div><h2 class="panel-title">Submissions to review</h2><p class="panel-description">Recent work from your student teams</p></div><div class="toolbar"><select class="select-filter" id="reviewFilter" aria-label="Filter submissions"><option value="all">All submissions</option><option value="In review">Awaiting review</option><option value="Approved">Reviewed</option></select></div></div><div id="teacherProjects">${teacherProjectRows()}</div></section>
+        <div style="height:16px"></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Student questions</h2><p class="panel-description">Questions from teams that could use your help</p></div><button class="text-button" data-action="teacher-queries">View inbox &rarr;</button></div><div class="query-list">${state.queries.length ? state.queries.map((q, i) => `<div class="query-item"><span class="query-bullet ${q.answered ? "answered" : ""}"></span><div class="query-copy"><div class="query-title">${escapeHtml(q.title)}</div><div class="query-meta">${q.answered ? "Answered" : "Needs a reply"}</div></div><button class="text-button" data-reply="${i}">${q.answered ? "View" : "Reply"}</button></div>`).join("") : '<div class="empty-state">No student questions yet.</div>'}</div></section>`;
+    }
+
+    function teacherProjectRows(filter = "all") {
+      const submissions = getStudentSubmissions();
+      const rows = submissions.map((project, index) => ({ project, index })).filter(row => filter === "all" || row.project.status === filter);
+      if (!rows.length) return '<div class="empty-state">No student submissions match this filter yet.</div>';
+      return rows.map(({ project, index }) => `<article class="teacher-project" data-project-card="${index}">
+        <div class="teacher-project-summary">
+          <div class="project-icon ${project.color || ""}">${icons.file}</div>
+          <div class="teacher-project-info">
+            <button class="project-title-toggle" type="button" data-expand-project="${index}" aria-expanded="false" aria-controls="project-details-${index}">${escapeHtml(project.name)}</button>
+            <div class="project-meta">${escapeHtml(project.teamName)}</div>
+          </div>
+          ${project.fileName && project.id ? `<button class="button-secondary" data-open-file="${index}">Open file</button><button class="button-secondary" data-download-file="${index}">Download</button>` : project.fileName ? '<span class="project-meta">Student needs to re-attach file</span>' : ""}
+        </div>
+        <div class="project-details hidden" id="project-details-${index}">
+          <section class="project-detail-section"><h3 class="project-detail-heading">Team</h3><div class="project-detail-grid">
+            <div class="project-detail-item"><span class="project-detail-label">Team name</span><span class="project-detail-value">${escapeHtml(project.teamName)}</span></div>
+            <div class="project-detail-item"><span class="project-detail-label">Team leader</span><span class="project-detail-value">${escapeHtml(project.teamLeader)}</span></div>
+            <div class="project-detail-item"><span class="project-detail-label">Department</span><span class="project-detail-value">${escapeHtml(project.department || "Not provided")}</span></div>
+            <div class="project-detail-item"><span class="project-detail-label">Team members</span><span class="project-detail-value">${escapeHtml(project.teamMembers || "No other members added")}</span></div>
+            <div class="project-detail-item"><span class="project-detail-label">Submitted by</span><span class="project-detail-value">${escapeHtml(project.studentName)} · ${escapeHtml(project.studentEmail)}</span></div>
+          </div></section>
+          <section class="project-detail-section"><h3 class="project-detail-heading">Submission</h3><div class="project-detail-grid">
+            <div class="project-detail-item"><span class="project-detail-label">Submitted date</span><span class="project-detail-value">${escapeHtml(formatSubmissionDate(project))}</span></div>
+            <div class="project-detail-item"><span class="project-detail-label">Attached file</span><span class="project-detail-value">${escapeHtml(project.fileName || "No file attached")}</span></div>
+          </div></section>
+          <section class="project-detail-section"><h3 class="project-detail-heading">Review</h3><div class="project-detail-grid"><div class="project-detail-item"><span class="project-detail-label">Current status</span><span class="project-detail-value">${escapeHtml(project.status)}</span></div><div class="project-detail-item"><span class="project-detail-label">Teacher remark</span><span class="project-detail-value">${escapeHtml(project.remark || "No remark yet")}</span></div></div>
+            <div class="project-detail-actions"><span class="status ${statusClass(project.status)}">${escapeHtml(project.status)}</span><button class="button-secondary" data-review="${index}">${project.status === "In review" ? "Review project" : "Update feedback"}</button></div>
+          </section>
+        </div>
+      </article>`).join("");
+    }
+
+    function teacherProjectsPage() {
+      const submissions = getStudentSubmissions();
+      return `<div class="page-heading"><div><p class="eyebrow">STUDENT WORKSPACE</p><h1>Student projects</h1><p class="page-subtitle">Select a project name to view its team leader, members, files, and submission details.</p></div></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">All student submissions</h2><p class="panel-description">${submissions.length} ${submissions.length === 1 ? "project" : "projects"} across student accounts</p></div><div class="toolbar"><select class="select-filter" id="projectFilter" aria-label="Filter student projects"><option value="all">All projects</option><option value="In review">Awaiting review</option><option value="Approved">Approved</option><option value="Needs changes">Needs changes</option></select></div></div><div id="teacherProjects">${teacherProjectRows()}</div></section>`;
+    }
+
+    function projectsPage() {
+      if (state.role === "teacher") return teacherProjectsPage();
+      return `<div class="page-heading"><div><p class="eyebrow">YOUR WORK</p><h1>My projects</h1><p class="page-subtitle">Keep track of your team’s submissions and teacher feedback.</p></div><button class="button-primary" data-action="upload">${icons.upload} Upload a project</button></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">All projects</h2><p class="panel-description">${state.projects.length} projects</p></div><span class="term-pill">Workspace</span></div><div class="projects-list">${state.projects.length ? state.projects.map((p, i) => `${projectRow(p)}<div class="project-attach-action"><button class="button-secondary" data-attach-file="${i}">${p.fileName ? "Replace attached file" : "Attach project file"}</button></div>`).join("") : '<div class="empty-state">No projects yet. Upload your team’s first project to get started.</div>'}</div></section>`;
+    }
+
+    function teamPage() {
+      return `<div class="page-heading"><div><p class="eyebrow">YOUR COLLABORATORS</p><h1>My team</h1><p class="page-subtitle">Meet the people bringing your project to life.</p></div><button class="button-primary" data-action="add-member">＋ Add teammate</button></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">${escapeHtml(state.teamName || "Your team")}</h2><p class="panel-description">${state.members.length} ${state.members.length === 1 ? "member" : "members"}</p></div><span class="leader-tag" style="padding:6px 9px">TEAM LEADER</span></div><div class="team-members">${state.members.length ? membersList() : '<div class="empty-state">No teammates yet. Invite classmates to build your team.</div>'}<button class="add-member" data-action="add-member">＋ Invite another teammate</button></div></section><div style="height:15px"></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Team communication</h2><p class="panel-description">Talk with your teammates or connect with other project teams.</p></div><button class="text-button" data-page="messages">Open team chat &rarr;</button></div></section>`;
+    }
+
+    function queriesPage() {
+      return `<div class="page-heading"><div><p class="eyebrow">ASK YOUR TEACHER</p><h1>Questions & answers</h1><p class="page-subtitle">Get guidance from your teacher as your team works through the project.</p></div><button class="button-primary" data-action="ask-question">＋ Ask a question</button></div><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Your questions</h2><p class="panel-description">Questions are shared with your teacher and team.</p></div></div><div class="query-list">${state.queries.length ? queriesList() : '<div class="empty-state">No questions yet. Ask your teacher for guidance.</div>'}<button class="add-member" data-action="ask-question">＋ Ask your teacher a question</button></div></section>`;
+    }
+
+    function messagesPage() {
+      const threads = [
+        { id: "team", initials: getInitials(state.teamName || "Team"), color: "", name: state.teamName || "Your team", preview: "Team messages will appear here", group: "YOUR TEAM" },
+        { id: "studio", initials: "OT", color: "green", name: "Other teams", preview: "Start a conversation with another team", group: "OTHER TEAMS" },
+        { id: "teacher", initials: "T", color: "orange", name: "Your teacher", preview: "Questions and feedback", group: "TEACHER" }
+      ];
+      const active = threads.find(thread => thread.id === state.selectedThread) || threads[0];
+      let threadMarkup = "";
+      let lastGroup = "";
+      for (const thread of threads) {
+        if (thread.group !== lastGroup) {
+          threadMarkup += `<div class="thread-label">${thread.group}</div>`;
+          lastGroup = thread.group;
+        }
+        threadMarkup += `<button class="thread-button ${thread.id === active.id ? "active" : ""}" data-thread="${thread.id}"><div class="avatar ${thread.color}">${thread.initials}</div><div><div class="thread-name">${thread.name}</div><div class="thread-preview">${thread.preview}</div></div></button>`;
+      }
+      const messages = state.messages[active.id] || [];
+      const messageMarkup = messages.length ? messages.map(message => `<div class="message ${message.mine ? "mine" : ""}">${message.mine ? "" : `<div class="avatar ${message.color}">${message.initials}</div>`}<div class="message-bubble">${escapeHtml(message.text)}</div><span class="message-time">${escapeHtml(message.time)}</span></div>`).join("") : '<div class="empty-state">No messages yet. Start the conversation.</div>';
+      return `<div class="page-heading"><div><p class="eyebrow">SAY HELLO</p><h1>Team chat</h1><p class="page-subtitle">Great projects come from great conversations.</p></div></div><section class="panel chat-layout"><div class="chat-threads">${threadMarkup}</div><div class="chat-room"><div class="chat-room-head"><div class="avatar ${active.color}">${active.initials}</div><div><div class="chat-room-title">${active.name}</div><div class="chat-room-subtitle">${active.id === "team" ? `${state.members.length} members · Your project team` : active.id === "teacher" ? "Your teacher" : "Connect with another team"}</div></div></div><div class="chat-messages" id="chatMessages"><div class="chat-date">TODAY</div>${messageMarkup}</div><form class="chat-form" id="chatForm"><input class="chat-input" id="chatInput" autocomplete="off" placeholder="Write a message..." aria-label="Write a message"><button class="chat-send" aria-label="Send message">${icons.send}</button></form></div></section>`;
+    }
+
+    function render() {
+      if (!state.account) return;
+      document.querySelector(".app-shell").classList.remove("hidden");
+      document.getElementById("authScreen").classList.add("hidden");
+      document.querySelectorAll(".nav-item").forEach(button => {
+        const enabled = state.role === "student" || ["overview", "projects", "queries"].includes(button.dataset.page);
+        button.classList.toggle("hidden", !enabled);
+        button.classList.toggle("active", button.dataset.page === state.page);
+        if (button.dataset.page === state.page) button.setAttribute("aria-current", "page");
+        else button.removeAttribute("aria-current");
+      });
+      if (state.role === "teacher" && ["team", "messages"].includes(state.page)) state.page = "overview";
+      document.getElementById("breadcrumbCurrent").textContent = state.role === "teacher" && state.page === "overview" ? "Teacher dashboard" : pageNames[state.page];
+      document.getElementById("profileName").textContent = state.account.name;
+      const accountType = state.role === "teacher" ? "Teacher" : "Student";
+      const accountPost = state.role === "teacher" ? (state.account.post || "Administrator") : (state.account.post || (state.members.length ? "Team leader" : "Team member"));
+      document.getElementById("profileRole").innerHTML = `<span>${escapeHtml(accountType)}</span><span>${escapeHtml(accountPost)}</span>`;
+      document.getElementById("profileAvatar").textContent = getInitials(state.account.name);
+      const projectCount = state.role === "teacher" ? getStudentSubmissions().length : state.projects.length;
+      document.querySelector('[data-page="projects"] span').textContent = state.role === "teacher" ? "Student projects" : "My projects";
+      document.querySelector('[data-count="projects"]').textContent = projectCount;
+      document.querySelector('[data-count="queries"]').textContent = state.queries.length;
+      const views = {
+        overview: () => state.role === "teacher" ? teacherOverview() : studentOverview(),
+        projects: projectsPage,
+        team: teamPage,
+        queries: queriesPage,
+        messages: messagesPage
+      };
+      content.innerHTML = views[state.page]();
+      const filter = document.getElementById("reviewFilter");
+      if (filter) filter.addEventListener("change", () => {
+        document.getElementById("teacherProjects").innerHTML = teacherProjectRows(filter.value);
+      });
+      const projectFilter = document.getElementById("projectFilter");
+      if (projectFilter) projectFilter.addEventListener("change", () => {
+        document.getElementById("teacherProjects").innerHTML = teacherProjectRows(projectFilter.value);
+      });
+      const chatForm = document.getElementById("chatForm");
+      if (chatForm) chatForm.addEventListener("submit", sendMessage);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function closeModal() {
+      document.getElementById("modalHost").innerHTML = "";
+    }
+
+    function showModal(title, subtitle, body, submitLabel, onSubmit) {
+      const host = document.getElementById("modalHost");
+      host.innerHTML = `<div class="modal-backdrop" data-close-modal><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><h2 class="modal-title" id="modalTitle">${title}</h2><p class="modal-subtitle">${subtitle}</p></div><button class="modal-close" type="button" aria-label="Close dialog" data-close-modal>×</button></div><form id="modalForm">${body}<div class="modal-actions"><button type="button" class="button-secondary" data-close-modal>Cancel</button><button type="submit" class="button-primary">${submitLabel}</button></div></form></section></div>`;
+      host.querySelector(".modal").addEventListener("click", event => event.stopPropagation());
+      host.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", closeModal));
+      host.querySelector("#modalForm").addEventListener("submit", event => {
+        event.preventDefault();
+        onSubmit(new FormData(event.currentTarget));
+      });
+      const firstField = host.querySelector("input:not([type=file]), textarea");
+      if (firstField) firstField.focus();
+    }
+
+    function uploadModal() {
+      showModal("Upload a project", "Share your team's latest work with your teacher.", `<label class="field-label" for="projectTitle">Project title</label><input class="field" id="projectTitle" name="title" placeholder="e.g. Final design prototype" required><label class="field-label" for="projectType">Project type</label><select class="field" id="projectType" name="type"><option>Project submission</option><option>Design & Technology</option><option>Research documentation</option><option>Presentation</option></select><label class="drop-zone" for="projectFile">${icons.upload}<strong id="fileName">Choose a file or drag it here</strong><span>Any file type · Max 25 MB</span></label><input class="file-input" id="projectFile" name="file" type="file"><label class="field-label" for="projectNote">Note for your teacher <span style="color:#a0a5b5;font-weight:500">(optional)</span></label><textarea class="textarea" id="projectNote" name="note" placeholder="Anything you'd like your teacher to know?"></textarea>`, "Submit project", async formData => {
+        const title = String(formData.get("title") || "").trim();
+        if (!title) return;
+        const file = formData.get("file");
+        if (file && file.size > 25 * 1024 * 1024) { showToast("Files must be 25 MB or smaller."); return; }
+        const submittedAt = new Date().toISOString();
+        const projectId = `submission-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        if (file && file.name) {
+          try { await saveSubmissionFile(projectId, file); }
+          catch { showToast("The file could not be stored. Please try another file."); return; }
+        }
+        state.projects.unshift({ id: projectId, name: title, type: String(formData.get("type")), date: `Submitted ${new Date(submittedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`, submittedAt, status: "In review", color: "orange", fileName: file && file.name ? file.name : "", remark: "" });
+        persistWorkspace();
+        closeModal();
+        render();
+        showToast("Project submitted for teacher review!");
+      });
+      const fileInput = document.getElementById("projectFile");
+      fileInput.addEventListener("change", () => {
+        document.getElementById("fileName").textContent = fileInput.files.length ? fileInput.files[0].name : "Choose a file or drag it here";
+      });
+    }
+
+    function attachProjectFileModal(index) {
+      const project = state.projects[index];
+      if (!project) return;
+      showModal("Attach project file", `Add or replace the file for “${escapeHtml(project.name)}”.`, `<label class="field-label" for="replacementFile">Choose project file</label><input class="field" id="replacementFile" name="file" type="file" required><p class="project-meta" style="margin-top:7px">Files up to 25 MB. Your teacher can open or download this attachment.</p>`, "Save attachment", async formData => {
+        const file = formData.get("file");
+        if (!file?.name) { showToast("Choose a file to continue."); return; }
+        if (file.size > 25 * 1024 * 1024) { showToast("Files must be 25 MB or smaller."); return; }
+        const projectId = project.id || `submission-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        try { await saveSubmissionFile(projectId, file); }
+        catch { showToast("The file could not be stored. Please try another file."); return; }
+        project.id = projectId;
+        project.fileName = file.name;
+        persistWorkspace();
+        closeModal();
+        render();
+        showToast("Project attachment saved for your teacher.");
+      });
+    }
+
+    function addMemberModal() {
+      showModal("Add a teammate", `Invite someone to join ${escapeHtml(state.teamName || "your team")}.`, `<label class="field-label" for="memberEmail">Student email</label><input class="field" id="memberEmail" name="email" type="email" placeholder="student@school.edu" required><label class="field-label" for="memberRole">Their role on the team</label><select class="field" name="role" id="memberRole"><option>Project contributor</option><option>UI / UX designer</option><option>Frontend developer</option><option>Research & content</option></select>`, "Send invite", formData => {
+        const email = String(formData.get("email") || "").trim();
+        const name = email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, char => char.toUpperCase());
+        const initials = name.split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "TM";
+        state.members.push({ name, initials, role: String(formData.get("role")), color: ["blue", "green", "orange", "rose"][state.members.length % 4], leader: false });
+        persistWorkspace();
+        closeModal();
+        render();
+        showToast(`Invite sent to ${email}`);
+      });
+    }
+
+    function questionModal() {
+      showModal("Ask your teacher", "Your question will be shared with your teacher and team.", `<label class="field-label" for="questionSubject">What’s your question about?</label><input class="field" id="questionSubject" name="subject" placeholder="A short summary" required><label class="field-label" for="questionDetails">Add some details</label><textarea class="textarea" id="questionDetails" name="details" placeholder="Tell your teacher what you need help with..." required></textarea>`, "Send question", formData => {
+        const subject = String(formData.get("subject") || "").trim();
+        if (!subject) return;
+        state.queries.unshift({ title: subject, meta: "Asked just now · Awaiting teacher reply", answered: false });
+        persistWorkspace();
+        closeModal();
+        render();
+        showToast("Your question was sent to your teacher.");
+      });
+    }
+
+    function reviewModal(index) {
+      const submission = state.role === "teacher" ? getStudentSubmissions()[index] : null;
+      const project = submission ? submission : state.projects[index];
+      if (!project) return;
+      const subtitle = submission ? `${submission.studentName} · ${submission.teamName} · ${submission.type}` : project.name;
+      showModal("Review submission", subtitle, `<label class="field-label" for="reviewStatus">Review status</label><select class="field" id="reviewStatus" name="status"><option ${project.status === "Approved" ? "selected" : ""}>Approved</option><option ${project.status === "In review" ? "selected" : ""}>In review</option><option ${project.status === "Needs changes" ? "selected" : ""}>Needs changes</option></select><label class="field-label" for="reviewRemark">Teacher remark</label><textarea class="textarea" id="reviewRemark" name="remark" placeholder="Share specific, constructive feedback...">${project.remark ? escapeHtml(project.remark) : ""}</textarea>`, "Save feedback", formData => {
+        const status = String(formData.get("status"));
+        const remark = String(formData.get("remark") || "").trim();
+        if (submission) {
+          const workspaceKey = `ideaWorkspace:${submission.ownerEmail}`;
+          const workspace = JSON.parse(localStorage.getItem(workspaceKey) || "null");
+          if (workspace?.projects?.[submission.projectIndex]) {
+            workspace.projects[submission.projectIndex].status = status;
+            workspace.projects[submission.projectIndex].remark = remark;
+            localStorage.setItem(workspaceKey, JSON.stringify(workspace));
+          }
+        } else {
+          project.status = status;
+          project.remark = remark;
+          persistWorkspace();
+        }
+        closeModal();
+        render();
+        showToast("Feedback saved for the student team.");
+      });
+    }
+
+    function replyModal(index) {
+      const query = state.queries[index];
+      if (!query) return;
+      showModal(query.answered ? "Your response" : "Reply to student", query.title, `<label class="field-label" for="teacherReply">Teacher response</label><textarea class="textarea" id="teacherReply" name="reply" placeholder="Write a helpful response..." required>${query.response ? escapeHtml(query.response) : ""}</textarea>`, query.answered ? "Update response" : "Send response", formData => {
+        query.response = String(formData.get("reply") || "").trim();
+        query.answered = true;
+        query.meta = "Answered just now · Teacher";
+        persistWorkspace();
+        closeModal();
+        render();
+        showToast("Your response was sent to the student team.");
+      });
+    }
+
+    function sendMessage(event) {
+      event.preventDefault();
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      state.messages[state.selectedThread].push({ name: state.account.name, initials: getInitials(state.account.name), color: state.role === "teacher" ? "orange" : "", text, time: "Now", mine: true });
+      persistWorkspace();
+      render();
+      const messages = document.getElementById("chatMessages");
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    document.addEventListener("click", event => {
+      const pageButton = event.target.closest("[data-page]");
+      if (pageButton) {
+        state.page = pageButton.dataset.page;
+        render();
+        return;
+      }
+      const actionButton = event.target.closest("[data-action]");
+      if (actionButton) {
+        const action = actionButton.dataset.action;
+        if (action === "upload") uploadModal();
+        else if (action === "add-member") addMemberModal();
+        else if (action === "ask-question") questionModal();
+        else if (action === "team") { state.page = "team"; render(); }
+        else if (action === "review-all") { state.page = "projects"; render(); }
+        else if (action === "teacher-queries") showToast("Your student question inbox is up to date.");
+        else if (action === "help") showToast("Help center: ask your teacher or visit the class resources.");
+        else if (action === "logout") { localStorage.removeItem("ideaSession"); state.account = null; state.members = []; document.querySelector(".app-shell").classList.add("hidden"); document.getElementById("authScreen").classList.remove("hidden"); setAuthMode("login"); }
+        else if (action === "notifications") showToast(state.role === "teacher" ? "You have 3 submissions awaiting review." : "You’re all caught up on notifications.");
+        return;
+      }
+      const threadButton = event.target.closest("[data-thread]");
+      if (threadButton) {
+        state.selectedThread = threadButton.dataset.thread;
+        render();
+        return;
+      }
+      const reviewButton = event.target.closest("[data-review]");
+      if (reviewButton) { reviewModal(Number(reviewButton.dataset.review)); return; }
+      const openFileButton = event.target.closest("[data-open-file]");
+      if (openFileButton) { openTeacherFile(Number(openFileButton.dataset.openFile)); return; }
+      const downloadFileButton = event.target.closest("[data-download-file]");
+      if (downloadFileButton) { downloadTeacherFile(Number(downloadFileButton.dataset.downloadFile)); return; }
+      const attachFileButton = event.target.closest("[data-attach-file]");
+      if (attachFileButton) { attachProjectFileModal(Number(attachFileButton.dataset.attachFile)); return; }
+      const expandProjectButton = event.target.closest("[data-expand-project]");
+      if (expandProjectButton) {
+        toggleProjectDetails(expandProjectButton);
+        return;
+      }
+      const projectCard = event.target.closest("[data-project-card]");
+      if (projectCard && !event.target.closest("button")) toggleProjectDetails(projectCard.querySelector("[data-expand-project]"));
+      const replyButton = event.target.closest("[data-reply]");
+      if (replyButton) { replyModal(Number(replyButton.dataset.reply)); }
+    });
+    window.addEventListener("storage", event => {
+      if (state.role === "teacher" && event.key?.startsWith("ideaWorkspace:")) render();
+    });
+
+    function getInitials(name) {
+      return String(name || "").trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "?";
+    }
+    function toggleProjectDetails(toggleButton) {
+      if (!toggleButton) return;
+      const details = document.getElementById(toggleButton.getAttribute("aria-controls"));
+      const expanded = toggleButton.getAttribute("aria-expanded") === "true";
+      toggleButton.setAttribute("aria-expanded", String(!expanded));
+      details?.classList.toggle("hidden", expanded);
+    }
+    function persistWorkspace() {
+      if (!state.account) return;
+      localStorage.setItem(`ideaWorkspace:${state.account.email}`, JSON.stringify({ teamName: state.teamName, projects: state.projects, members: state.members, queries: state.queries, messages: state.messages }));
+    }
+    function openFileDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("IdeaProjectFiles", 1);
+        request.onupgradeneeded = () => request.result.createObjectStore("files", { keyPath: "id" });
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+    async function saveSubmissionFile(id, file) {
+      const db = await openFileDatabase();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction("files", "readwrite");
+        transaction.objectStore("files").put({ id, file, name: file.name, type: file.type });
+        transaction.oncomplete = () => { db.close(); resolve(); };
+        transaction.onerror = () => { db.close(); reject(transaction.error); };
+        transaction.onabort = () => { db.close(); reject(transaction.error); };
+      });
+    }
+    async function readSubmissionFile(id) {
+      const db = await openFileDatabase();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction("files", "readonly");
+        const request = transaction.objectStore("files").get(id);
+        request.onsuccess = () => { db.close(); resolve(request.result || null); };
+        request.onerror = () => { db.close(); reject(request.error); };
+      });
+    }
+    async function openTeacherFile(index) {
+      const project = getStudentSubmissions()[index];
+      if (!project?.id) { showToast("This submission has no stored attachment."); return; }
+      const fileTab = window.open("about:blank", "_blank");
+      if (!fileTab) { showToast("Allow pop-ups to open the attached file."); return; }
+      try {
+        const stored = await readSubmissionFile(project.id);
+        if (!stored?.file) { fileTab.close(); showToast("The attached file is not available. Ask the team to upload it again."); return; }
+        const fileUrl = URL.createObjectURL(stored.file);
+        fileTab.location.href = fileUrl;
+      } catch {
+        fileTab.close();
+        showToast("Could not open the attached file.");
+      }
+    }
+    async function downloadTeacherFile(index) {
+      const project = getStudentSubmissions()[index];
+      if (!project?.id) { showToast("This submission has no stored attachment."); return; }
+      try {
+        const stored = await readSubmissionFile(project.id);
+        if (!stored?.file) { showToast("The attached file is not available. Ask the student to attach it again."); return; }
+        const fileUrl = URL.createObjectURL(stored.file);
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = stored.name || project.fileName || "project-file";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(fileUrl), 60000);
+      } catch {
+        showToast("Could not download the attached file.");
+      }
+    }
+    function applyTheme(theme) {
+      const allowed = ["light", "night", "ambient"];
+      const selected = allowed.includes(theme) ? theme : "light";
+      document.documentElement.dataset.theme = selected;
+      const icons = { light: "☼", night: "☾", ambient: "◐" };
+      const labels = { light: "Light", night: "Night", ambient: "Ambient" };
+      document.getElementById("themeIcon").textContent = icons[selected];
+      document.getElementById("themeToggle").setAttribute("aria-label", `Color mode: ${labels[selected]}. Click to change mode.`);
+      document.getElementById("themeToggle").title = `Color mode: ${labels[selected]} · Click to change`;
+      document.querySelector('meta[name="theme-color"]').content = selected === "night" ? "#141a23" : selected === "ambient" ? "#f4ecdf" : "#f6f7fb";
+      localStorage.setItem("ideaTheme", selected);
+    }
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const modes = ["light", "night", "ambient"];
+      const current = document.documentElement.dataset.theme || "light";
+      const next = modes[(modes.indexOf(current) + 1) % modes.length];
+      applyTheme(next);
+      showToast(`Entered ${next[0].toUpperCase()}${next.slice(1)} mode`);
+    });
+    applyTheme(localStorage.getItem("ideaTheme") || "light");
+
+    let authMode = "signup";
+    function setPasswordVisibility(show) {
+      const input = document.getElementById("accountPassword");
+      const button = document.getElementById("passwordToggle");
+      input.type = show ? "text" : "password";
+      button.setAttribute("aria-pressed", String(show));
+      button.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      button.title = show ? "Hide password" : "Show password";
+      document.getElementById("passwordEye").innerHTML = show
+        ? '<path d="M3 3 21 21"/><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.2 0 9.5 6 9.5 6a16.5 16.5 0 0 1-3 3.6M6.2 6.3C3.8 8 2.5 12 2.5 12s3.3 6 9.5 6c1.2 0 2.3-.2 3.2-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+        : '<path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>';
+    }
+    function setAuthMode(mode) {
+      authMode = mode;
+      const signup = mode === "signup";
+      document.getElementById("signupFields").classList.toggle("hidden", !signup);
+      document.getElementById("accountName").required = signup;
+      updateSignupFields();
+      document.getElementById("accountPassword").autocomplete = signup ? "new-password" : "current-password";
+      document.getElementById("accountPassword").type = "password";
+      document.getElementById("accountPassword").placeholder = signup ? "Create a password" : "Enter your password";
+      setPasswordVisibility(false);
+      document.getElementById("authTitle").textContent = signup ? "Start with a fresh account" : "Log in to your account";
+      document.getElementById("authCopy").textContent = signup ? "Enter your own details to set up your student or teacher workspace." : "Enter the email and password you used when you created your account.";
+      document.getElementById("authSubmit").textContent = signup ? "Submit" : "Log in";
+      document.getElementById("signupTab").classList.toggle("active", signup);
+      document.getElementById("loginTab").classList.toggle("active", !signup);
+      document.getElementById("authError").textContent = "";
+      document.getElementById("accountName").value = "";
+      document.getElementById("accountDepartment").value = "";
+      document.getElementById("teamNameInput").value = "";
+      document.getElementById("accountPost").selectedIndex = 0;
+      document.getElementById("accountEmail").value = "";
+      document.getElementById("accountPassword").value = "";
+    }
+    function updatePostOptions() {
+      const role = document.getElementById("accountRole").value;
+      const options = role === "teacher" ? ["Administrator", "Instructor"] : ["Team leader", "Team member"];
+      document.getElementById("accountPost").innerHTML = '<option value="" selected disabled>Choose your post</option>' + options.map(post => `<option value="${post}">${post}</option>`).join("");
+      updateSignupFields();
+    }
+    function updateSignupFields() {
+      const isStudent = document.getElementById("accountRole").value === "student";
+      document.getElementById("studentSetupFields").classList.toggle("hidden", !isStudent || authMode !== "signup");
+      document.getElementById("accountPost").required = isStudent && authMode === "signup";
+      document.getElementById("accountDepartment").required = isStudent && authMode === "signup";
+    }
+    async function passwordDigest(value) {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+    document.getElementById("signupTab").addEventListener("click", () => setAuthMode("signup"));
+    document.getElementById("loginTab").addEventListener("click", () => setAuthMode("login"));
+    document.getElementById("passwordToggle").addEventListener("click", () => setPasswordVisibility(document.getElementById("accountPassword").type === "password"));
+    document.getElementById("accountRole").addEventListener("change", updatePostOptions);
+    updatePostOptions();
+    document.getElementById("authForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const email = String(form.get("email") || "").trim().toLowerCase();
+      const password = String(form.get("password") || "");
+      const error = document.getElementById("authError");
+      if (!email || !password) { error.textContent = "Enter your email and password to continue."; return; }
+      const accounts = JSON.parse(localStorage.getItem("ideaAccounts") || "{}");
+      if (authMode === "signup") {
+        const name = String(form.get("name") || "").trim();
+        if (!name) { error.textContent = "Enter your name to create an account."; return; }
+        if (accounts[email]) { error.textContent = "An account with this email already exists. Choose Log in."; return; }
+        const role = String(form.get("role") || "student");
+        accounts[email] = { name, email, role, post: role === "teacher" ? "Administrator" : String(form.get("post") || ""), department: role === "student" ? String(form.get("department") || "").trim() : "", teamName: role === "teacher" ? "" : String(form.get("teamName") || "").trim(), passwordHash: await passwordDigest(password) };
+        localStorage.setItem("ideaAccounts", JSON.stringify(accounts));
+        localStorage.setItem("ideaSession", email);
+      } else {
+        const account = accounts[email];
+        if (!account || account.passwordHash !== await passwordDigest(password)) { error.textContent = "We couldn’t find a matching account. Check your details or create an account."; return; }
+        localStorage.setItem("ideaSession", email);
+      }
+      const current = accounts[email];
+      state.account = { name: current.name, email: current.email, role: current.role, post: current.post || (current.role === "teacher" ? "Administrator" : "Team leader"), department: current.department || "" };
+      state.teamName = current.teamName || "";
+        state.role = current.role;
+      state.members = current.role === "student" ? [{ name: current.name, initials: getInitials(current.name), role: current.post || "Team leader", color: "", leader: current.post !== "Team member" }] : [];
+      state.projects = [];
+      state.queries = [];
+      state.messages = { team: [], studio: [], teacher: [] };
+      const workspace = JSON.parse(localStorage.getItem(`ideaWorkspace:${email}`) || "null");
+      if (workspace) {
+        state.teamName = workspace.teamName || state.teamName;
+        state.members = workspace.members || state.members;
+        state.projects = workspace.projects || [];
+        state.queries = workspace.queries || [];
+        state.messages = workspace.messages || state.messages;
+      } else persistWorkspace();
+      render();
+    });
+    if (savedAccount && activeEmail === savedAccount.email) render();
+  </script>
+</body>
+</html>
